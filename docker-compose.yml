@@ -1,0 +1,27 @@
+
+services:
+  cassandra:
+    image: cassandra:3.11
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_CLUSTER_NAME=Test Cluster
+    networks:
+      - temporal-net
+
+  temporal:
+    image: temporalio/auto-setup
+    ports:
+      - "7233:7233"
+    environment:
+      - CASSANDRA_SEEDS=cassandra
+      - TEMPORAL_CASSANDRA_KEYSPACE=temporal
+      - TEMPORAL_CASSANDRA_VISIBILITY_KEYSPACE=temporal_visibility  # Ensuring visibility keyspace
+      - TEMPORAL_CASSANDRA_VISIBILITY=true  # Add this line to enable visibility store
+      - TEMPORAL_CASSANDRA_CLUSTER_NAME=Test Cluster  # Ensuring cluster name is correct
+    networks:
+      - temporal-net
+
+networks:
+  temporal-net:
+    driver: bridge
